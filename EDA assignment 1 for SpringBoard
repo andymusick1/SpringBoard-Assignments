@@ -1,0 +1,408 @@
+title: "Udacity EDA Homework 1 - Andy Musick"
+author: "Andy Musick"
+date: "February 3, 2016"
+output: html_document
+---
+
+```{r}
+summary(diamonds)
+```
+    carat               cut        color    
+ Min.   :0.2000   Fair     : 1610   D: 6775  
+ 1st Qu.:0.4000   Good     : 4906   E: 9797  
+ Median :0.7000   Very Good:12082   F: 9542  
+ Mean   :0.7979   Premium  :13791   G:11292  
+ 3rd Qu.:1.0400   Ideal    :21551   H: 8304  
+ Max.   :5.0100                     I: 5422  
+                                    J: 2808  
+    clarity          depth           table      
+ SI1    :13065   Min.   :43.00   Min.   :43.00  
+ VS2    :12258   1st Qu.:61.00   1st Qu.:56.00  
+ SI2    : 9194   Median :61.80   Median :57.00  
+ VS1    : 8171   Mean   :61.75   Mean   :57.46  
+ VVS2   : 5066   3rd Qu.:62.50   3rd Qu.:59.00  
+ VVS1   : 3655   Max.   :79.00   Max.   :95.00  
+ (Other): 2531                                  
+     price             x                y         
+ Min.   :  326   Min.   : 0.000   Min.   : 0.000  
+ 1st Qu.:  950   1st Qu.: 4.710   1st Qu.: 4.720  
+ Median : 2401   Median : 5.700   Median : 5.710  
+ Mean   : 3933   Mean   : 5.731   Mean   : 5.735  
+ 3rd Qu.: 5324   3rd Qu.: 6.540   3rd Qu.: 6.540  
+ Max.   :18823   Max.   :10.740   Max.   :58.900  
+                                                  
+       z         
+ Min.   : 0.000  
+ 1st Qu.: 2.910  
+ Median : 3.530  
+ Mean   : 3.539  
+ 3rd Qu.: 4.040  
+ Max.   :31.800  
+
+```{r}
+library(ggplot2)
+```
+
+ Question 1 Answers
+ 53940
+ 10
+ 3
+ d
+ 
+ 
+ Question # 2
+ 
+ # Create a histogram of the price of
+# all the diamonds in the diamond data set.
+
+# TYPE YOUR CODE BELOW THE LINE
+# =======================================
+ 
+ 
+```{r}
+qplot(price, data=diamonds)
+```
+
+Question 3
+
+What I wrote:
+
+The data is skewed right (tail is to the right).  There is also a massive spike that is slightly ahead of "zero."  It probably warrants further examination.  Summary statistics are as follows:
+
+Minimum: 326
+1st Quartile: 950
+Median: 2401
+3rd Quartile: 5324
+Max: 18823
+
+Mean: 3933
+ 
+
+```{r}
+qplot(price, data=diamonds, binwidth = 10)+
+scale_x_continuous(lim = c(350,2500), breaks =seq(350,2500,500))+
+facet_wrap(~cut)
+``` 
+
+Question 4 answers
+1729
+0
+1656
+
+```{r}
+table(diamonds$price<500)
+table(diamonds$price<250)
+table(diamonds$price>=15000)
+```
+
+
+Question 5
+
+```{r}
+qplot(price, data=diamonds, binwidth = 10)+
++ scale_x_continuous(lim = c(350,2500), breaks =seq(350,2500,100))
+ggsave('diamondhistomusick.png')
+```
+
+
+Question 6
+
+```{r}
+qplot(price, data=diamonds, binwidth = 10)+
++ scale_x_continuous(lim = c(350,2500), breaks =seq(350,2500,100))+
++ facet_wrap(~cut)
+```
+
+
+
+Question 7 Answers
+
+a)premium
+b) premium and ideal
+c)ideal
+
+
+```{r}
+table(diamonds$price)
+by(diamonds$price, diamonds$cut, summary)
+```
+
+
+```{r}
+table(diamonds$price)
+by(diamonds$price, diamonds$cut, max)
+```
+
+
+Question 8
+
+```{r}
+qplot(x = price, data = diamonds) + facet_wrap(~cut, scales = "free_y")
+```
+
+
+Question 9
+
+
+```{r}
+diamonds$price_per_carat <- (diamonds$price / diamonds$carat)
+```
+
+```{r}
+qplot(x = log10(price_per_carat +1), data=diamonds, binwidth =.1)+
+scale_x_continuous(lim = c(2.5,4.5), breaks =seq(2.5,4.5,.5))+  
+facet_wrap(~cut)
+``` 
+
+Question 10
+
+```{r}
+qplot(x = cut, y = price, data =diamonds, geom = 'boxplot')
+```
+
+
+Question 11
+
+```{r}
+qplot(x = color, y = price, data =diamonds, geom = 'boxplot')
+
+by(diamonds$price, diamonds$color, summary)
+```
+
+Question 12
+
+```{r}
+qplot(x = color, y = price_per_carat, data =diamonds, geom = 'boxplot')
+
+by(diamonds$price_per_carat, diamonds$color, summary)
+```
+
+Question 13
+
+```{r}
+qplot(carat, data=diamonds, binwidth = .01, geom = 'freqpoly')+
+scale_x_continuous(lim = c(0,2), breaks =seq(0,2,.1))
+```
+ 
+Question 14
+
+For this, I'm going to use my price guide data set so I don't have to work with something all new to me (it's also very late, and work is fast approaching)
+
+```{r}
+ summary(NESset4HWS)
+```
+
+```{r}
+qplot(loose.price, data = NESset4HWS)
+```
+
+```{r}
+qplot(loose.price, data = NESset4HWS, binwidth = 10)+
+scale_x_continuous(lim = c(0,500), breaks =seq(0,500,10))+
+facet_wrap(~console.name)
+```
+
+Question 14 - 2.0
+
+GapMinder data set:
+
+I chose the military expenditures data set.  In the set expenditures are listed as a percentage of the countries total GDP.  For this I'm going to do some really basic things, but if I was going to study this further, I would look at the percentage of GDP relative to teh total amount of GDP to gather a more fundamental understanding of who is really focusing on military expenditures (i.e. 10% of 100 is much more impactful on a bottom line than 10% of say 1,000,000 depending on how you frame it)
+
+Note: I converted it to a CSV file prior to uploading it
+
+```{r}
+military_expend <- read.csv(file.choose())
+```
+
+```{r}
+library(ggplot2)
+```
+
+```{r}
+summary(military_expend)
+```
+
+At a glance, the mean, median, and quartiles remain relatively stable with a slight propensity to decline over time.  The minimums and maximums tend to fluctuate a bit though.  Perhaps this has to do with certain countries exiting and entering armed conflicts with one another. 
+ 
+ 
+ Let's look at a plot for military expenditures for the first year in the data set.
+ 
+```{r}
+qplot(X1988, data = military_expend)
+```
+
+Let's look at a plot for the year 2000
+
+```{r}
+qplot(X2000, data = military_expend)
+```
+
+Now the last year in teh set, 2011
+
+```{r}
+qplot(X2011, data = military_expend)
+```
+
+Without looking at them all (which we can ceratinly do), it looks like things don't change much.  But since we can, let's look at them all at once
+
+Note: I've tried to run the code below based on something I've found online, but my inability to get it to cooperate on thi set is quite frustrating.  I'll defer to you to see if we can get it fixed.
+
+```{r}
+library(psych)
+```
+
+```{r}
+multi.hist <- function(x) {nvar <- dim(x)[2]  #number of variables
+     nsize=trunc(sqrt(nvar))+1   #size of graphic
+     old.par <- par(no.readonly = TRUE) # all par settings which can be changed
+     par(mfrow=c(nsize,nsize))       #set new graphic parameters
+     for (i in 1:nvar) {
+     name=names(x)[i]                #get the names for the variables
+     hist(x[,i],main=name,xlab=name) }  #draw the histograms for each variable
+     on.exit(par(old.par))   #set the graphic parameters back to the original
+     }
+```
+
+```{r}
+multi.hist(military_expend)
+```
+
+Let's just focus on the most recent year to show that I can do things
+
+```{r}
+qplot(X2011, data=military_expend, binwidth = 1)+
+scale_x_continuous(lim = c(0, 5), breaks =seq(0, 5, 1))
+```
+
+We've removed some dramatic outliers, but we're still very much skewed to the right.
+
+Now, I'll try to perform a log transformation to see if we can normalize the data a bit.
+
+```{r}
+qplot(x = log10(X2011+1), data=military_expend, binwidth = 1)+
+scale_x_continuous(lim = c(0, 5), breaks =seq(0, 5, 1))
+```
+
+That doesn't really appear to help much.  Perhaps it's because these numbers are already expressed in percentage form and the numbers are so small.  Let me try one last thing
+
+```{r}
+qplot(x = log10(X2011+1), data=military_expend, binwidth = .1)+
+scale_x_continuous(lim = c(0, 1), breaks =seq(0, 1, .1))
+```
+
+Eureka!!! The numbers were so small to begin with that taking the log10 of them really shrunk them down!  As we can now see the plot is now normalized.
+
+I hope this will suffice in terms of a quick summarization of this data.  I will provide more as necessary
+
+
+Question 15:
+
+I just used the facebook data set provided.  I rarely get on facebook anymore.
+
+Subquestions these folks want answered:
+
+A) How many people share your birthday?
+B) Which Month contains the most birthdays?
+C) How many birthdays are in each month?
+D) Which day of the year has the most number of birthdays
+E) Do you have at least 365 friends that have birthdays on every day of the year?
+
+My Added Question:
+Which day of the week has the most birthdays?
+
+
+```{r}
+bdays_dummy <- read.csv(file.choose())
+```
+
+```{r}
+library(ggplot2)
+```
+
+```{r}
+qplot(dates, data=bdays_dummy)
+```
+
+Yeesh, that's rough.  There is one interesting thing I can see though.  If you look closely the there are definite peaks and valleys.  If you drew a line from tip to tip, it would look like an EKG Machine.
+
+Before I get too much further, we have an issue.  The "dates" variable parsed in a as a factor variable.  So I need to fix that.
+
+
+```{r}
+bdays_dummy$retread <- as.Date(bdays_dummy$dates, format = "%m/%d/%Y")
+```
+
+
+```{r}
+class(bdays_dummy$retread)
+```
+
+Date
+
+
+Now that's better.  Now, since everybody has the same birth year (as best I can tell), I'll isolate the days of the week on which people are born, and their respective birth month, by creating two new variables: birthDAY and birthMONTH.
+
+
+```{r}
+bdays_dummy$birthDAY <- weekdays(bdays_dummy$retread)
+```
+
+
+```{r}
+bdays_dummy$birthMONTH <- months(bdays_dummy$retread)
+```
+
+Perfect.  Now I can tackle the questions.
+
+A)  My birthday is March 18th.  Let's see the matches
+
+```{r}
+table(bdays_dummy$retread=="2014-03-18")
+```
+
+FALSE  TRUE 
+ 1030     3 
+ 
+That indicates that three other individuals have my birthdate.
+
+Let's answer my question:
+
+```{r}
+table(bdays_dummy$birthDAY)
+```
+
+Friday    Monday  Saturday    Sunday  Thursday   Tuesday Wednesday 
+126       169       115       171       145       155       152 
+
+More people appear to be born on Sunday than other day. Trying to skip church perhaps :)
+
+The next bit of code will answer B) and C)
+
+```{r}
+table(bdays_dummy$birthMONTH)
+```
+
+April    August  December  February   January      July      June     March       May  November   October September 
+81        91        72        79        89        86        93        98        72        87        89        96 
+
+As we can see the most people are born in September for whatever reason.  May and December have the least amount of births which is also interesting.
+
+Next up is D)
+
+```{r}
+summary(bdays_dummy$dates)
+```
+
+I won't paste all of the info from the code this go round, but it appears as though we have a three way tie for February 6th, May 22nd, and July 16th.
+
+Now for E):
+
+I'm sure there's a much more convoluted way to do this, but all we are looking for to answer this question is find a single missing date.  I came up with three ways to do this specifically in R Studio:
+
+First, I clicked the data set in the Environment Window and hit the cell format pic.  You can sort the data, eyeball it, and find a missing value.
+
+Second, you can go to the same Environment Window, click the play button, and you can see next to dates it says "Factor w/ 348 levels."  That indicates clearly that there aren't 365 levels, meaning there's not 365 unique ways.
+
+Third, you can essentially run the same code that I did to find those that match my birthdate and go until you find something with a missing value.
+
+I hope this satisfies the assignment to your liking, and I await your feedback.
