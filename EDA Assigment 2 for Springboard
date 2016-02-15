@@ -1,0 +1,24 @@
+```{r}
+stuff <- read.csv(file.choose())
+```
+
+```{r}
+qplot(x = stuff$loose.price, y=stuff$retail.loose.buy, data=stuff)
+```
+
+Wow, that is crazy ugly, and at some point I'll have to really bisect this sucker.  At any rate, at a glance this indicates that as the loose.price (meaning the price of a loose copy sold) increases, the more I should in turn be willing to pay for it according to the price.guide data set
+
+```{r}
+cor.test(stuff$loose.price, stuff$retail.loose.buy, method = 'pearson')
+```
+
+It doesn't want to do a correlation test for some reason.  I'll have to do some investigating.  It does look as though there is a correlation though, at a glance.
+
+```{r}
+ggplot(data=stuff, aes(x=stuff$loose.price, y=stuff$retail.loose.buy))+
+geom_point(alpha = 1/100)
+```
+
+Well, it's still quite terrible.  But I can see where I'm going to likely have to really break this apart by system and/or other breakpoint areas to really get any sort of consistent understanding of what the heck is going on.
+
+Hope this is sufficient for moving on for now
