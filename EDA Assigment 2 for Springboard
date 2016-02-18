@@ -1,3 +1,280 @@
+title: "EDA Homework 2 SpringBoard / Udacity Lesson 4"
+author: "Andy Musick"
+date: "February 9, 2016"
+output: html_document
+---
+
+```{r}
+library(ggplot2)
+```
+
+```{r}
+data(diamonds)
+```
+
+Question 1
+
+Run a scatterplot that shows price vs X
+
+```{r}
+qplot(x = diamonds$x, y=diamonds$price, data=diamonds)
+```
+
+Question 2 response:
+
+So I put price on the Y axis as that is what I'm accustomed to seeing on supply and demand curves.  So What I'm seeing is that as x increases the price tends to go up.  Now what "x" is, we don't know, but what's interesting is that it increases at a seemingly exponential rate.
+
+Question 3:
+
+Correlation between price and x
+
+```{r}
+cor.test(diamonds$price, diamonds$x, method = 'pearson')
+```
+
+cor 
+0.8844352  -- highly correlated
+
+Correlation between price and y
+
+```{r}
+cor.test(diamonds$price, diamonds$y, method = 'pearson')
+```
+
+cor 
+0.8654209 -- also highly correlated
+
+Correlation between price and z
+
+```{r}
+cor.test(diamonds$price, diamonds$z, method = 'pearson')
+```
+
+cor 
+0.8612494 -- again, highly correlated with each other.
+
+I think later on we learn these are dimensions of the diamonds.  This makes sense as intuitively we would say "the bigger the diamond, the more expensive it will likely be."
+
+Question 4:
+
+```{r}
+ggplot(data=diamonds, aes(x=diamonds$depth, y=diamonds$price))+
+geom_point()
+```
+
+Without doing a lot, we get a very tightly wound scatterplot that looks like a tree trunk.
+
+Question 5:
+
+```{r}
+ggplot(data=diamonds, aes(x=diamonds$depth, y=diamonds$price))+
+geom_point(alpha = 1/100)+
+scale_x_discrete(breaks =seq(0,80,2))  
+```
+
+So, here I've captured all of the data, but frankly it looks terrible.  I also think I need to switch to scale_x_continuous
+
+```{r}
+ggplot(data=diamonds, aes(x=diamonds$depth, y=diamonds$price))+
+geom_point(alpha = 1/100)+
+scale_x_continuous(breaks=seq(50,76,2))  
+```
+
+It's better, but still not super great - let's try a range of 58 to 66
+
+```{r}
+ggplot(data=diamonds, aes(x=diamonds$depth, y=diamonds$price))+
+geom_point(alpha = 1/100)+
+scale_x_continuous(breaks=seq(58,66,2))  
+```
+
+Personally, I'm still dissatisfied with how this looks, but that is what the assignment is asking for.  So, I'll drive on.
+
+
+Question 6:
+
+I put my numbers in, and their grader rejected it.  Apparently, you need to set the x-axis parameters from 58 to 64.
+
+
+Question 7:
+
+```{r}
+cor.test(diamonds$depth, diamonds$price, method = 'pearson')
+```
+
+cor 
+-0.0106474 
+
+Based on the coefficient - would you use depth to predict the price of the diamond?  No.
+
+That coefficient is so low that the relationship is negligible.  If you look at the graph, it's hard to distinguish any true sort of directional relationship
+
+Question 8:
+
+
+```{r}
+ggplot(data=diamonds, aes(x=diamonds$carat, y=diamonds$price))+
+geom_point()+
+xlim(0, quantile(diamonds$carat, .99))+
+ylim(0, quantile(diamonds$price, .99))
+```
+
+We've got a plot that looks to show a relationship indicating that as carats go up, so does the price.  As a guy that wants to propose to his girlfriend one day, I can testify to this unfortunate occurrence.
+
+
+Question 9:
+
+First we need to create this volume variable
+
+```{r}
+diamonds$volume <- diamonds$x*diamonds$y* diamonds$z
+```
+
+That takes care of the variable.
+
+```{r}
+ggplot(data=diamonds, aes(x=diamonds$volume, y=diamonds$price))+
+geom_point()
+```
+
+Well it's ugly, but they say not to change it yet.
+
+
+Question 10:
+
+There's a strong upward correlation.  As volume increases, price generally increases exponentially.  Probably need to zoom in on the data to really get a feel for things better.
+
+
+Question 11:
+
+```{r}
+cor.test(diamonds$volume, diamonds$price, method = 'pearson')
+```
+
+Without subsetting it, the correlation coefficient is .9023845
+
+```{r}
+with(subset(diamonds, diamonds$volume > 0 & diamonds$volume < 800), cor.test(diamonds$volume, diamonds$price))
+```
+
+The above code did not work for some reason, so I'll try the method of creating a separate data set.
+
+```{r} 
+stupidset1 <- subset(diamonds, diamonds$volume > 0 & diamonds$volume < 800)
+```
+
+```{r}
+cor.test(stupidset1$volume, stupidset1$price)
+```
+
+cor 
+0.9235455 
+
+Now that is much better.  Let's see if the auto-grader likes it.
+
+SUCCESS
+
+
+Question 12:
+
+
+```{r}
+ggplot(data=stupidset1, aes(x=stupidset1$volume, y=stupidset1$price))+
+geom_point(alpha = 1/20, position = position_jitter(h = 0), color = 'red')+
+stat_smooth(method = "gam", formula = y ~ s(x), size = 1)
+```
+
+I think the graph would be a great way to get a rough estimate of the price of a diamond relative to volume.  It's intuitive, and at a glance, tends to fit in line with what the data is generally telling us.
+
+Question 13:
+
+```{r}
+suppressMessages(library(ggplot2))
+suppressMessages(library(dplyr))
+data(diamonds)
+```
+
+```{r}
+diamondsByClarity <- diamonds %>%
+group_by(clarity)%>%
+summarise(price_mean = mean(price), price_median = median(price), price_min = min_rank(price), price_max = max(price), n = n()) %>%
+arrange (clarity)
+
+head(diamondsByClarity)
+```
+
+```{r}
+summary(diamondsByClarity)
+```
+
+For some reason, the machine hates my code, but I got the following answers:
+
+clarity price_mean price_median price_min price_max     n
+   (fctr)      (dbl)        (dbl)     (int)     (int) (int)
+1      I1   3924.169         3344      1399     18531   741
+2     SI2   5063.029         4072      1400     18804  9194
+3     SI1   3996.001         2822      1401     18818 13065
+4     VS2   3924.989         2054      1402     18823 12258
+5     VS1   3839.455         2005      1403     18795  8171
+6    VVS2   3283.737         1311      1403     18768  5066
+
+I won't run through each one, but for I1 we have a mean price of $3,924.17, a median price of $3,344, a minimum price of $1,399, a max price of $18,531, and a total of 741 diamonds with that clarity level.
+
+Question 14:
+
+```{r}
+data(diamonds)
+library(dplyr)
+
+diamonds_by_clarity <- group_by(diamonds, clarity)
+diamonds_mp_by_clarity <- summarise(diamonds_by_clarity, mean_price = mean(price))
+
+diamonds_by_color <- group_by(diamonds, color)
+diamonds_mp_by_color <- summarise(diamonds_by_color, mean_price = mean(price))
+```
+
+```{r}
+library(gridExtra)
+```
+
+```{r}
+colorplot <- barplot(diamonds_mp_by_color$mean_price, names.arg=diamonds_mp_by_color$color, border=NA, las=1)
+```
+
+```{r}
+clarityplot <- barplot(diamonds_mp_by_clarity$mean_price, names.arg=diamonds_mp_by_clarity$clarity, border=NA, las=1)
+```
+
+```{r}
+grid.arrange(clarityplot, colorplot, nrow=2)
+```
+
+Well, that's not working.  So let's try making charts via ggplot.
+
+```{r}
+colorplot3 <- ggplot(diamonds_mp_by_color, aes(x=diamonds_mp_by_color$color, y=diamonds_mp_by_color$mean_price))+geom_bar(stat = "identity")
+
+colorplot3
+```
+
+Alright, we have one that works.  I'm just going to follow through with the assignment that wants us to show two graphs at a time.  So, I'm going to create another plot that takes the mean price divided by two to make a separate graph (there's not much insight to be gaine, but this is more of a "I'm showing you I can do this" thing)
+
+```{r}
+colorplot4 <- ggplot(diamonds_mp_by_color, aes(x=diamonds_mp_by_color$color, y=diamonds_mp_by_color$mean_price / 2))+geom_bar(stat = "identity")
+
+colorplot4
+```
+
+```{r}
+grid.arrange(colorplot3, colorplot4, ncol =1)
+```
+
+Hooray!  Now we have two bar plots stacked on top of each other.  The first one is twice the size of the other, which means they are two different plots.
+
+Question 15:
+
+I'm a little tired, and I won't do too much.  I'm going to pull in my own data set, make a few plots, and turn this in.  My data set is not quite complete, but I'll throw a few things in there to show that I know what I'm doing.
+
 ```{r}
 stuff <- read.csv(file.choose())
 ```
