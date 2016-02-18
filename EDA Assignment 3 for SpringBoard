@@ -1,0 +1,172 @@
+---
+title: "EDA HW 3"
+author: "Andy Musick"
+date: "February 16, 2016"
+output: html_document
+---
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+
+
+Question 1:
+
+```{r}
+library(ggplot2)
+```
+
+```{r}
+data(diamonds)
+```
+
+```{r}
+qplot(diamonds$price, data=diamonds, binwidth = 10)
++facet_wrap(~diamonds$color)
+```
+
+I was able to create a basic histogram, but nothing too fantastic just yet.
+
+```{r}
+library(dplyr)
+```
+
+```{r}
+ggplot(diamonds, aes(x = price, fill = cut)) +
+  geom_histogram() +
+  facet_wrap(~ color) +
+  scale_fill_brewer(type = 'qual')
+```
+
+So, directionally we're correct, but it's nothing like the desired graphs.  It looks like we really need to change the frame of the data to hone in on the pertinent stuff.
+
+With that said, even if I shrunk the parameters, the graphs would still look largely skewed to the right.  So let's try some sort of transformative deal and see what happens.
+
+```{r}
+diamonds$log.price <- log10(diamonds$price)
+```
+
+```{r}
+ggplot(diamonds, aes(x = log.price, fill = cut)) +
+  geom_histogram() +
+  facet_wrap(~ color) +
+  scale_fill_brewer(type = 'qual')
+```
+
+There we go.  That's fairly close to what the desirable graph looks like.  Without getting too nitty gritty, we can kind of see that on the whole, an ideal cut diamond will generally b more expensive than the rest, then the premium, and so on.
+
+Question 2
+
+```{r}
+ggplot(diamonds, aes(x = diamonds$table, y = diamonds$price, color = cut)) + 
+  geom_jitter(size = 5) +
+  scale_x_continuous(lim = c(50,80), breaks =seq(50, 80, 2)) +
+  scale_color_brewer(type = 'qual')
+```
+
+I can't remember what table represents, but as we can see the worse diamonds are spread more to the right (as table increases), and the ideal diamonds are further to the left (as table decreases)
+
+Question 3:
+
+Ideal cut diamond range 53 to 57.  The Premium cut diamons are from 58 to 62.
+
+Question 4:
+
+```{r}
+diamonds$volume <- diamonds$x * diamonds$y * diamonds$z
+```
+
+
+```{r}
+ggplot(subset(diamonds, volume <= quantile(volume, 0.99) & volume > 0 ), aes(x = volume, y = price, color = clarity)) +
+  geom_jitter(size = 3) + 
+  scale_y_log10() +
+  scale_color_brewer(type = 'div')
+```
+
+I tried to run the above code by simply subbing in my log.price variable I created earlier, and it wouldn't cooperate for whatever reason.  I removed the scale_y_log10 command but it still hated me.
+
+At any rate, as we can tell by the graph, as clarity improves the price increases.  This is a relatively common assertion as it pertains to diamonds and our graph seems to agree with that.
+
+
+Question 5:
+
+```{r}
+fb <- tbl_df(read.table("pseudo_facebook.tsv", header=TRUE))
+```
+
+```{r}
+pf$prop_initiated <- pf$friendships_initiated/pf$friend_count
+```
+
+This creates the proportion of friends initiated relative to total friend count.
+
+Question 6:
+
+```{r}
+pf$year_joined <- floor(2014 - pf$tenure/365)
+```
+
+```{r}
+pf$year.joined.bucket <- cut(pf$year_joined, c(2004, 2009, 2011, 2012, 2014))
+```
+
+```{r}
+ggplot(pf, aes(x=tenure, y=prop_initiated)) +
+  geom_line(aes(color=year.joined.bucket), stat='summary', fun.y=mean)
+```
+
+It looks as if as tenure increases the range and volatility of the proportion of friends initiated increases.
+
+Question 7:
+
+```{r}
+ggplot(pf, aes(x=tenure, y=prop_initiated)) +
+  geom_smooth(aes(color=year.joined.bucket))
+```
+
+According to the smoother line, this indicates that as tenure increases the proportion of friendships initiated decreases over time.
+
+Question 8
+
+People who joined after 2012
+
+```{r}
+table(pf$prop_initiated)
+by (pf$prop_initiated, pf$year.joined.bucket, summary)
+```
+
+Question 9:
+
+Mean is .6654
+
+They just joined, and they want to expand their network as quickly as possible.  That initial surge will cause their proportion to go up initially, and as time progresses it will decline.
+
+Question 10:
+
+```{r}
+ggplot(diamonds, aes(x = cut, y = price/carat, color = color)) + 
+  geom_jitter() + 
+  facet_wrap(~clarity) + 
+  scale_color_brewer(type = 'div')
+```
+
+Generally as the carats go up so does the price (trust me).  This indicates that regardless of color, that that is the case
+
+
+Question 11:
+
+I'm not going to go too crazy as my data still has a lot of work to be done on it from a formatting perspective.
+
+So I'll just play around with a few graphs.  Once again, this is from my price guide data set.  I'll remember to upload it later if I haven't already done so.
+
+```{r}
+ggplot(stuff, aes(x = retail.loose.buy, y=loose.price, color = console.name))+
+  geom_jitter()+
+  scale_color_brewer()
+```
+
+Well that still gives me a fairly terrible graph.  I'm going to have to chop it up later.
+
+I'm not going to spend too much time on this now, as I want to hurry up, finish the coursework, and get cracking on the Capstone accordingly.
